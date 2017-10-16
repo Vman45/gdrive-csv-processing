@@ -3,18 +3,29 @@ function doGet() {
 }
 
 function uploadAndProcess(theForm) {
-   var anExampleText = theForm.anExample;  // This is a string
+   var folderName = theForm.theFolder;  // This is a string
    var fileBlob = theForm.theFile;         // This is a Blob.
 
-    var folders = DriveApp.getFoldersByName("csv-test");
-    var folder = folders.next();
+    var folders = DriveApp.getFoldersByName(folderName);
+    var folder = DriveApp.getRootFolder();
+    if (folders.hasNext()){
+       folder = folders.next();
+    }
 
    var f= folder.createFile(fileBlob);
    createSheet(f, folder);
-//   var adoc = DocsList.createFile(fileBlob);
    return f.getName();
 }
 
+function listFolders(){
+  var allFolders = DriveApp.getFolders();
+  var result = [];
+  while (allFolders.hasNext())
+  {
+    result.push(allFolders.next().getName());
+  }
+  return result;
+}
 
 
 function createSheet(file, folder){
@@ -43,19 +54,11 @@ function parseCsv(file){
   var data = Utilities.parseCsv(content);
   Logger.log(data);
 
-  return data;
+  return processCsv(data);
 }
 
-
-// test function
-function open() {
-  var folders = DriveApp.getFoldersByName("csv-test");
-  var folder = folders.next();
-  var files=folder.getFilesByType(MimeType.CSV);
-
-   while (files.hasNext()) {
-     var file = files.next();
-     Logger.log(file.getName());
-     createSheet(file, folder);
-   }
+function processCsv(data)
+{
+  // TODO : processing goes here
+  return data;
 }
