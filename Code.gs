@@ -1,22 +1,35 @@
+/**
+ * Entry point, the GET request to Webapp
+ */
 function doGet() {
   return HtmlService.createHtmlOutputFromFile('form.html');
 }
 
+/**
+ * Upload file handler
+ */
 function uploadAndProcess(theForm) {
-   var folderName = theForm.theFolder;  // This is a string
-   var fileBlob = theForm.theFile;         // This is a Blob.
+   var folderName = theForm.theFolder;
+   var fileBlob = theForm.theFile;
 
-    var folders = DriveApp.getFoldersByName(folderName);
-    var folder = DriveApp.getRootFolder();
-    if (folders.hasNext()){
+   if (fileBlob.length==0){
+     throw new Error( "No file is choosen or it is empty" );
+   }
+
+   var folders = DriveApp.getFoldersByName(folderName);
+   var folder = DriveApp.getRootFolder();
+   if (folders.hasNext()){
        folder = folders.next();
-    }
+   }
 
    var f= folder.createFile(fileBlob);
    createSheet(f, folder);
    return f.getName();
 }
 
+/**
+ * List Folders
+ */
 function listFolders(){
   var allFolders = DriveApp.getFolders();
   var result = [];
@@ -27,11 +40,17 @@ function listFolders(){
   return result;
 }
 
-
+/**
+ * Create Sheet from the give CSV file in the given folder
+ */
 function createSheet(file, folder){
   // Create new file w/o the extension '.csv'
   var csvName = file.getName();
-  var ss = SpreadsheetApp.create(csvName.substr(0,csvName.length-4));
+  var sheetName = csvName;
+  if (endsWith(csvName.toLowerCase(),'.csv')){
+     sheetName = csvName.substr(0,csvName.length-4);
+  }
+  var ss = SpreadsheetApp.create(sheetName);
   // move to the same folder where CSV file is
   var temp = DriveApp.getFileById(ss.getId());
   folder.addFile(temp)
@@ -47,18 +66,20 @@ function createSheet(file, folder){
   }
 }
 
-function parseCsv(file){
-  var content = file.getBlob().getDataAsString();
-  Logger.log(content);
-
-  var data = Utilities.parseCsv(content);
-  Logger.log(data);
-
-  return processCsv(data);
+/**
+ * Check if the string ends with the given suffix
+ */
+function endsWith(str, suffix) {
+    return str.indexOf(suffix, str.length - suffix.length) !== -1;
 }
 
-function processCsv(data)
-{
-  // TODO : processing goes here
-  return data;
+/**
+ * Parse CSV into 2D array
+ */
+function parseCsv(file){
+  var content = file.getBlob().getDataAsString();
+  var data = Utilities.parseCsv(content);
+  Logger.log(data);
+  // call process and return the data
+  return processCsv(data);
 }
