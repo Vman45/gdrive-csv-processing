@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+      <script>
+         function handleFormSubmit(formObject) {
+          $('#progressBar').show();
+          $('button').prop('disabled', true);
+          $('#result').text('Uploading ... ');
+          google.script.run.withSuccessHandler(successHandler).withFailureHandler(failureHandler).uploadAndProcess(formObject);
+         };
+
+         function successHandler(name) {
+          $('button').prop('disabled', false);
+          $('#progressBar').hide();
+          $('#result').text('File created! '+name);
+          $('#fileNameInDialog').text(name);
+          $('#confirmationModal').modal('show');
+         }
+
+         function failureHandler(error) {
+          $('button').prop('disabled', false);
+          $('#progressBar').hide();
+          $('#result').text('Unable to process: '+error.message);
+         }
+      </script>
+   </head>
+   <body>
+      <nav class="navbar navbar-toggleable-md navbar-inverse bg-inverse">
+         <a class="navbar-brand" href="#">Sales conversion tool</a>
+      </nav>
+      <p></p>
+      <!-- Main jumbotron for a primary marketing message or call to action -->
+      <div class="container">
+         <div class="row">
+            <div class="col-md-8 offset-md-2">
+               <div class="card">
+                  <div class="card-header">
+                     Convert CSV to Salesforce format sheet
+                  </div>
+                  <div class="card-block  text-center">
+                     <form>
+                        <div class="form-group">
+                           <label for="exampleInputFile">File input</label>
+                           <input type="file" name="theFile" class="form-control-file" id="exampleInputFile" aria-describedby="fileHelp">
+                           <!--input type="hidden" name="anExample"-->
+                           <small id="fileHelp" class="form-text text-muted">This tool will parse the csv, filter it and convert to the Sheets with the same name</small>
+                           <div class="progress" id="progressBar" style="display: none;">
+                              <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
+                           </div>
+                        </div>
+                        <button type="button" onclick="handleFormSubmit(this.parentNode)" class="btn btn-primary">Upload</button>
+                     </form>
+                  </div>
+                  <div class="card-footer text-muted" id="result">
+                     Select the file and hit Upload
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+      <div class="modal fade" id="confirmationModal">
+         <div class="modal-dialog" role="document">
+            <div class="modal-content">
+               <div class="modal-header">
+                  <h5 class="modal-title">Google Sheet created!</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                  </button>
+               </div>
+               <div class="modal-body">
+                  <p>Google sheet has been created. Please check it out : <span id="fileNameInDialog"></span></p>
+               </div>
+               <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+               </div>
+            </div>
+         </div>
+      </div>
+      <!-- jQuery first, then Tether, then Bootstrap JS. -->
+      <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+   </body>
+</html>
